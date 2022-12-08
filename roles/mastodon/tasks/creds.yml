@@ -24,7 +24,7 @@
     group: "root"
     mode: 0644
     block: |
-      The Mastodon server GUI is now available at {{ subdomain }}.{{ domain }}
+      The Mastodon server GUI is now available at {{ domain }}
       The randomly generate Owner Password and PSQL Password are listed in /root/.deployment-secrets.txt
 
       ** STORE THESE VALUES SOMEWHERE SAFE AND SECURE **
