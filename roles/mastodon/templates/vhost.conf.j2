@@ -6,7 +6,7 @@ map $http_upgrade $connection_upgrade {
 server {
   listen 80;
   listen [::]:80;
-  server_name {{ domain }} {{ subdomain}};
+  server_name {{ domain }};
   root /home/mastodon/live/public;
   # Useful for Let's Encrypt
   location /.well-known/acme-challenge/ { allow all; }
