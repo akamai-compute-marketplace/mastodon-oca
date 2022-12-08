@@ -1,0 +1,12 @@
+# RUN ansible playbook
+
+- name: configuring Mastodon 
+  hosts: localhost
+  connection: local
+  gather_facts: true
+  any_errors_fatal: true
+  user: root
+  vars_files:
+    - group_vars/mastodon/vars
+  roles:
+    - mastodon

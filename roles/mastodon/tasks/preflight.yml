@@ -1,0 +1,116 @@
+# roles/tasks/preflight.yml
+- name: create mastodon user
+  user:
+    name: "mastodon"
+    createhome: true
+    shell: /bin/bash
+    home: /home/mastodon/
+
+- name: clone mastodon
+  ansible.builtin.git:
+    repo: https://github.com/mastodon/mastodon.git
+    dest: /home/mastodon/live
+    clone: yes
+
+- name: grab mastodon latest json
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/mastodon/mastodon/releases/latest
+    return_content: yes
+  register: json_response
+
+- name: get mastodon latest version
+  set_fact:
+    mastodonlatest: "{{ json_response.content | from_json | json_query('tag_name') }}"
+
+- name: git checkout
+  ansible.builtin.git:
+    repo: 'https://github.com/mastodon/mastodon.git'
+    dest: /home/mastodon/live
+    version: "{{ mastodonlatest }}"
+
+- name: generate db password
+  set_fact:
+    psql_password: "{{ lookup('password', '/dev/null length=32 chars=ascii_letters,digits') }}"
+
+- name: insert docker-compose file
+  template:
+    src: docker-compose.yml.j2
+    dest: /home/mastodon/live/docker-compose.yml
+
+- name: change owner of public
+  file:
+    path: "/home/mastodon/live/public"
+    owner: "mastodon"
+    group: "mastodon"
+    recurse: true
+
+- name: setting env secrets
+  template:
+    src: env.production.j2
+    dest: /home/mastodon/live/.env.production
+
+# secret gen
+
+- name: starting postgresql and redis container
+  community.docker.docker_compose:
+    project_src: "/home/mastodon/live"
+    services:
+      - db
+      - redis
+    build: false
+
+- name: pulling new container images
+  community.docker.docker_compose:
+    project_src: "/home/mastodon/live"
+    services:
+      - web
+      - streaming
+      - sidekiq
+    build: false
+    pull: true
+
+- name: get secret_key_base
+  shell: "docker-compose run --rm web bundle exec rake secret"
+  args:
+    chdir: /home/mastodon/live
+  register: secret_key_base
+
+- name: get otp_secret
+  shell: "docker-compose run --rm web bundle exec rake secret"
+  args:
+    chdir: /home/mastodon/live
+  register: otp_secret
+
+- name: generate vapid keys
+  shell: "docker-compose run --rm web bundle exec rake webpush:generate_keys"
+  args:
+    chdir: /home/mastodon/live
+  register: vapid_keys
+
+- name: get valid public key
+  debug:
+    msg: "the return is {{ item }}"
+  loop:
+    - "{{ vapid_keys.stdout_lines[1] | split('Public  -> ') | last }}"
+    - "{{ vapid_keys.stdout_lines[2] | split('Private -> ') | last }}"
+
+- name: updating production env
+  lineinfile:
+    path: /home/mastodon/live/.env.production
+    regexp: "{{ item.search }}"
+    line: "{{ item.replace }}"
+  loop:
+    - { search: '^\#?#VAPID_PUBLIC_KEY=', replace: "VAPID_PUBLIC_KEY={{ vapid_keys.stdout_lines[1] | split('Public  -> ') | last }}" }
+    - { search: '^\#?#VAPID_PRIVATE_KEY=', replace: "VAPID_PRIVATE_KEY={{ vapid_keys.stdout_lines[2] | split('Private -> ') | last }}" }
+    - { search: '^\#?#SECRET_KEY_BASE=', replace: "SECRET_KEY_BASE={{ secret_key_base.stdout }}" }
+    - { search: '^\#?#OTP_SECRET=', replace: "OTP_SECRET={{ otp_secret.stdout }}" }
+
+- name: recreating the database
+  shell: "docker-compose run --rm web bundle exec rake db:reset"
+  args:
+    chdir: /home/mastodon/live
+
+- name: bringing up mastodon containers
+  community.docker.docker_compose:
+    project_src: "/home/mastodon/live"
+    build: false

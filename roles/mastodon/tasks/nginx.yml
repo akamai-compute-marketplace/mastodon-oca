@@ -1,0 +1,66 @@
+# roles/tasks/nginx.yml
+- name: installing nginx
+  apt:
+    pkg:
+    - nginx
+    - nginx-common
+    state: present
+
+- name: enabling nginx on boot
+  service:
+    name: nginx
+    enabled: yes
+
+# Letsencrypt
+- name: installing certbot package
+  apt:
+    pkg:
+    - python3-certbot-nginx
+
+- name: check DNS propogation
+  ansible.builtin.shell: dig @8.8.8.8 +short {{ domain }}
+  register: result
+  until: result.stdout == ansible_default_ipv4.address
+  retries: 5
+  delay: 10
+
+- name: installing let's encrypt certificates
+  shell:
+    cmd: "certbot -n --nginx --agree-tos --redirect -d {{ domain }} -m {{ soa_email_address }}"
+
+# runs every Monday at midnight
+- name: installing auto-renewal cron
+  cron:
+    user: root
+    name: 'certbot auto-renewals'
+    minute: 0
+    hour: 0
+    month: '*'
+    weekday: '1'
+    job: '/usr/bin/certbot renew --quiet -n'
+    state: present
+
+# back to nginx because mastodon as ships a custom nginx config and it will fail the ssl generation
+# so I generate it on the default and point to it on the nginx config :)
+- name: disable nginx default site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+
+- name: moving vhost template
+  template:
+    src: vhost.conf.j2
+    dest: "/etc/nginx/sites-available/{{ domain }}.conf"
+    owner: root
+    group: root
+    mode: 0644
+
+- name: symlinking our vhost
+  file:
+    src: "/etc/nginx/sites-available/{{ domain }}.conf"
+    dest: "/etc/nginx/sites-enabled/{{ domain }}.conf"
+    owner: root
+    group: root
+    mode: 0644
+    state: link
+  notify: reload nginx

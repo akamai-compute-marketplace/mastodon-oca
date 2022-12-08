@@ -1,0 +1,18 @@
+# roles/common/handlers
+
+- name: restart ssh
+  ansible.builtin.systemd:
+    name: ssh
+    state: restarted
+    enabled: yes
+
+- name: reload nginx
+  ansible.builtin.systemd:
+    name: nginx
+    state: reloaded
+
+- name: restart postfix
+  ansible.builtin.systemd:
+    name: postfix
+    state: restarted
+    enabled: yes

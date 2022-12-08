@@ -1,0 +1,77 @@
+# roles/tasks/common.yml
+- name: apt update
+  apt:
+    update_cache: yes
+
+- name: apt upgrade
+  apt:
+    upgrade: full
+
+- name: install basic packages
+  apt:
+    pkg:
+    - htop
+    - curl
+    - wget
+    - gnupg
+    - apt-transport-https
+    - lsb-release
+    - ca-certificates
+    - python3-dotenv
+    state: present
+
+- name: secure ssh configs
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: "{{ item.search }}"
+    line: "{{ item.replace }}"
+  loop:
+    - { search: '^\#?PermitRootLogin (yes|no)', replace: 'PermitRootLogin without-password' }
+    - { search: '^\#?PasswordAuthentication (yes|no)', replace: 'PasswordAuthentication no' }
+    - { search: '^\#?PubkeyAuthentication (yes|no)', replace: 'PubkeyAuthentication yes' }
+  notify: restart ssh
+
+- name: create a domain
+  linode.cloud.domain:
+    domain: '{{ domain }}'
+    type: master
+    soa_email: '{{ soa_email_address }}'
+    state: present
+
+- name: create domain a record
+  linode.cloud.domain_record:
+    domain: '{{ domain }}'
+    name: '{{ domain }}'
+    type: 'A'
+    target: '{{ ansible_default_ipv4.address }}'
+    ttl_sec: 300
+    state: present
+
+- name: create MX record for domain
+  linode.cloud.domain_record:
+    domain: '{{ domain }}'
+    name: '{{ domain }}'
+    type: 'MX'
+    target: '{{ domain }}'
+    priority: 10
+    state: present
+
+- name: create SPF records for domain
+  linode.cloud.domain_record:
+    domain: '{{ domain }}'
+    name: '{{ domain }}'
+    type: 'TXT'
+    target: 'v=spf1 a ~all'
+    state: present
+
+- name: setting system hostname
+  hostname:
+    name: '{{ domain }}'
+
+- name: update /etc/hosts
+  lineinfile:
+    insertafter: EOF
+    path: /etc/hosts
+    line: |
+      # Mastodon
+      {{ ansible_default_ipv4.address }} {{ domain }}

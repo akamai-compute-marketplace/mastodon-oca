@@ -1,0 +1,32 @@
+# roles/tasks/creds.yml
+- name: assign Owner user and password
+  shell: "docker exec live_web_1 tootctl accounts create {{ owner_username }} --email {{ owner_email }} --confirmed --role Owner"
+  register: OWNER_PASSWORD
+
+- name: writing deployment credentials locally
+  blockinfile:
+    path: "/root/.deployment-secrets.txt"
+    create: yes
+    owner: "root"
+    group: "root"
+    mode: 0644
+    block: |
+      # PSQL password
+      password: {{ psql_password }}
+      # Owner password
+      password: {{ OWNER_PASSWORD.stdout | split('New password: ') | last }}
+
+- name: write MOTD
+  blockinfile:
+    path: "/etc/motd"
+    create: no
+    owner: "root"
+    group: "root"
+    mode: 0644
+    block: |
+      The Mastodon server GUI is now available at {{ subdomain }}.{{ domain }}
+      The randomly generate Owner Password and PSQL Password are listed in /root/.deployment-secrets.txt
+
+      ** STORE THESE VALUES SOMEWHERE SAFE AND SECURE **
+
+      Information on Mastodon configurations at https://docs.joinmastodon.org/

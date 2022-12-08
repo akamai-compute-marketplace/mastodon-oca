@@ -1,0 +1,18 @@
+# roles/tasks/main.yml
+- name: install common
+  import_tasks: common.yml
+
+- name: install docker
+  import_tasks: docker.yml
+
+- name: install preflight
+  import_tasks: preflight.yml
+
+- name: install nginx
+  import_tasks: nginx.yml
+
+- name: install postfix
+  import_tasks: postfix.yml
+
+- name: install creds
+  import_tasks: creds.yml
