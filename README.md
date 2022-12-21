@@ -32,14 +32,11 @@ The Linode Marketplace allows you to easily deploy software on a Compute Instanc
 
 ### Mastodon Options
 
-| **Linode API Token** | A valid Linode API token with Read/Write permissions to Domains. *Required* |
-
-| **SOA Email** | An email address you control to be the Source of Authority for the generated DNS zone. *Required* |
-
-| **Domain** | A valid domain name for your Mastodon instance, with Linode's name servers configured as the [authoritative name servers](https://www.linode.com/docs/products/networking/dns-manager/get-started/#use-linodes-name-servers). *Required* |
-
-| **Mastodon Owner User** | The username for the Admin user that will be created for the Mastodon server. *Required* |   
-
-| **Mastodon Owner Email** | The contact email for the Admin user that will be created for the Mastodon server. *Required* |   
-
-| **Single User Mode** | Enabling Single User Mode prevents other users from joining the Mastodon Server, while disabling it allows it. *Required* |
+| Name	| Description	
+| :---	| :---		
+| **Linode API Token**	| A valid Linode API token with Read/Write permissions to Domains. *Required*
+| **SOA Email** | An email address you control to be the Source of Authority for the generated DNS zone. *Required* 
+| **Domain** | A valid domain name for your Mastodon instance, with Linode's name servers configured as the [authoritative name servers](https://www.linode.com/docs/products/networking/dns-manager/get-started/#use-linodes-name-servers). *Required* 
+| **Mastodon Owner User** | The username for the Admin user that will be created for the Mastodon server. *Required* 
+| **Mastodon Owner Email** | The contact email for the Admin user that will be created for the Mastodon server. *Required*   
+| **Single User Mode** | Enabling Single User Mode prevents other users from joining the Mastodon Server, while disabling it allows it. *Required* 

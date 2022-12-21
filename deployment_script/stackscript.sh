@@ -5,7 +5,7 @@ set -x
 #<UDF name="token_password" label="Your Linode API token" />
 #<UDF name="soa_email_address" label="Email address (for the Let's Encrypt SSL certificate)" example="user@domain.tld" />
 #<UDF name="owner_username" label="Username for Mastodon Owner" example="" />
-#<UDF name="owner_email" label="Email address for Mastodon Owner" example="owner@example.com" />
+#<UDF name="owner_email" label="Email address for Mastodon Owner" example="user@domain.tld" />
 #<UDF name="single_user_mode" label="Do you want to start Mastodon in single-user mode?" oneOf="Yes,No" />
 
 
