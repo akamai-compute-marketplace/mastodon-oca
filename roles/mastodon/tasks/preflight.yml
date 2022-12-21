@@ -40,8 +40,8 @@
 - name: change owner of public
   file:
     path: "/home/mastodon/live/public"
-    owner: "mastodon"
-    group: "mastodon"
+    owner: "991"
+    group: "991"
     recurse: true
 
 - name: setting env secrets
