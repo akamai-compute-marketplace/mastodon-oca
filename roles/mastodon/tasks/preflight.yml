@@ -37,21 +37,13 @@
     src: docker-compose.yml.j2
     dest: /home/mastodon/live/docker-compose.yml
 
-- name: change owner of public
-  file:
-    path: "/home/mastodon/live/public"
-    state: directory
-    owner: "991"
-    group: "991"
-    recurse: yes
-
-- name: change owner of system
-  file:
-    path: "/home/mastodon/live/public/system"
-    state: directory
-    owner: "991"
-    group: "991"
-    recurse: yes
+#- name: change owner of public
+#  file:
+#    path: "/home/mastodon/live/public"
+#    state: directory
+#    owner: "991"
+#    group: "991"
+#    recurse: true
 
 - name: setting env secrets
   template:
@@ -118,6 +110,14 @@
   shell: "docker-compose run --rm web bundle exec rake db:reset"
   args:
     chdir: /home/mastodon/live
+
+- name: change owner of public
+  file:
+    path: "/home/mastodon/live/public"
+    state: directory
+    owner: "991"
+    group: "991"
+    recurse: true
 
 - name: bringing up mastodon containers
   community.docker.docker_compose:
