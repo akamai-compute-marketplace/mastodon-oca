@@ -43,7 +43,15 @@
     state: directory
     owner: "991"
     group: "991"
-    recurse: true
+    recurse: yes
+
+- name: change owner of system
+  file:
+    path: "/home/mastodon/live/public/system"
+    state: directory
+    owner: "991"
+    group: "991"
+    recurse: yes
 
 - name: setting env secrets
   template:
