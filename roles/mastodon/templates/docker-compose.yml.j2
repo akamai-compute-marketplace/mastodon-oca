@@ -12,7 +12,7 @@ services:
     networks:
       - internal_network
     healthcheck:
-      test: ['CMD', 'pg_isready', '-U', 'postgres']
+      test: ['CMD', 'pg_isready', '-U', 'mastodon']
     volumes:
       - ./postgres14:/var/lib/postgresql/data
     # - ./postgres14:/var/lib/postgresql/14/main/data
