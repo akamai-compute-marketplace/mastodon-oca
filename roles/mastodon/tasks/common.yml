@@ -18,7 +18,6 @@
     - lsb-release
     - ca-certificates
     - python3-dotenv
-    - docker-compose
     state: present
 
 - name: secure ssh configs
