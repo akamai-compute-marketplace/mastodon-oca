@@ -10,7 +10,7 @@ set -x
 
 
 # git repo + workdirs
-export GIT_REPO="https://linode-solutions@github.com/linode-solutions/mastodon-oca.git"
+export GIT_REPO="https://github.com/akamai-compute-marketplace/mastodon-oca.git"
 export WORK_DIR="/tmp/oca-deployment"
 export LINODE_API_TOKEN="${TOKEN_PASSWORD}"
 
