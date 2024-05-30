@@ -1,5 +1,11 @@
 # Linode Marketplace Mastodon One-Click App
 
+**This repository has been archived, and is unsupported.**
+
+The Mastodon One-Click App is still available in the [Marketplace Apps repo](https://github.com/akamai-compute-marketplace/marketplace-apps/tree/main/apps/linode-marketplace-mastodon)
+
+-----
+
 The Linode Marketplace is designed to make it easier for developers and companies to share [One-Click Apps](https://www.linode.com/marketplace/) with the Linode community. One-Click Apps are portable and modular solutioning tools written as Ansible playbooks. The Linode Marketplace allows users to quickly deploy services and perform essential configurations on a Linode Compute Instance's first boot.
 
 # About Mastodon
